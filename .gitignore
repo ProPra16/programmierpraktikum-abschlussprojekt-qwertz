@@ -10,3 +10,10 @@
 # intellij
 .idea
 *.iml
+
+# eclipse
+.metadata
+bin/
+.settings/
+.project
+.classpath

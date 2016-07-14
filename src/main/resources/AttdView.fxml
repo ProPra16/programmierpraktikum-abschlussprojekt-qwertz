@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import attd.core.CustomListView?>
+<?import attd.core.ErrorControl?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2">
+	<center>
+		<SplitPane dividerPositions="0.29914529914529914"
+			focusTraversable="true">
+			<items>
+				<SplitPane dividerPositions="0.6657458563535912"
+					focusTraversable="true" orientation="VERTICAL">
+					<items>
+						<CustomListView fx:id="CatalogListView"
+							stylesheets="@../../resources/ListView.css" />
+						<BorderPane>
+							<center>
+								<TextArea fx:id="DescriptionArea" wrapText="true" />
+							</center>
+						</BorderPane>
+					</items>
+				</SplitPane>
+				<BorderPane>
+					<center>
+						<VBox prefHeight="-1.0" prefWidth="-1.0">
+							<children>
+								<BorderPane prefHeight="-1.0" prefWidth="-1.0"
+									VBox.vgrow="ALWAYS">
+									<bottom>
+										<BorderPane>
+											<left>
+												<Label fx:id="StateLabel" text="" />
+											</left>
+											<right>
+												<Label fx:id="RemainingTimeLabel" text="" />
+											</right>
+										</BorderPane>
+									</bottom>
+									<center>
+										<SplitPane dividerPositions="0.6936416184971098"
+											focusTraversable="true" orientation="VERTICAL" prefHeight="-1.0"
+											prefWidth="-1.0">
+											<items>
+												<BorderPane prefHeight="-1.0" prefWidth="-1.0">
+													<center>
+														<TextArea fx:id="CodeArea" wrapText="true" />
+													</center>
+												</BorderPane>
+												<BorderPane prefHeight="-1.0" prefWidth="-1.0">
+													<center>
+														<ErrorControl fx:id="ErrorView" prefHeight="-1.0"
+															prefWidth="-1.0" />
+													</center>
+												</BorderPane>
+											</items>
+										</SplitPane>
+									</center>
+								</BorderPane>
+							</children>
+						</VBox>
+					</center>
+				</BorderPane>
+			</items>
+		</SplitPane>
+	</center>
+	<top>
+		<MenuBar>
+			<menus>
+				<Menu mnemonicParsing="false" text="Start">
+					<items>
+						<MenuItem mnemonicParsing="false" onAction="#onLoadCatalogClick"
+							text="Katalog laden" />
+						<MenuItem mnemonicParsing="false" onAction="#onSaveCatalogClick"
+							text="Aufgabe speichern" />
+						<MenuItem mnemonicParsing="false" onAction="#onCatalogChangeClick"
+							text="Workspace ändern" />
+					</items>
+				</Menu>
+				<Menu mnemonicParsing="false" text="">
+					<graphic>
+						<Button onMouseClicked="#onExecuteButtonClick" text="▶" />
+					</graphic>
+				</Menu>
+				<Menu mnemonicParsing="false" text="">
+					<graphic>
+						<Button fx:id="ReturnButton" disable="true" onMouseClicked="#onReturnButtonClick"
+							text="return" />
+					</graphic>
+				</Menu>
+			</menus>
+		</MenuBar>
+	</top>
+</BorderPane>

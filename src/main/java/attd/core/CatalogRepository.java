@@ -15,27 +15,28 @@ public final class CatalogRepository {
 	private final CatalogLoader catalogLoader;
 	private final ConfigLoader configLoader;
 	private Catalog catalog;
-	private ListProperty<Exercise> catalog1 = new SimpleListProperty<>();
-	
+	private ListProperty<Exercise> catalogExercises = new SimpleListProperty<>();
+
 	public CatalogRepository() {
 		catalogLoader = new CatalogLoader();
 		configLoader = new ConfigLoader();
 	}
-		
-	public ListProperty<Exercise> catalogProperty(){return catalog1;}
-	
+
+	public ListProperty<Exercise> catalogProperty() {
+		return catalogExercises;
+	}
+
 	public boolean load() {
 		Config config = configLoader.load();
-		if(config == null){return false;}
+		if (config == null) return false;
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setInitialDirectory(new File(config.getWorkspace()));
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("XML-Dateien", "*.xml"));
 		File file = fileChooser.showOpenDialog(null);
 		if (file != null) {
 			catalog = catalogLoader.load(file.getAbsolutePath());
-			catalog1.set(FXCollections.observableList(catalog.getExercises()));
+			catalogExercises.set(FXCollections.observableList(catalog.getExercises()));
 		}
-		
 		return true;
 	}
 

@@ -7,5 +7,6 @@ repositories {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile 'junit:junit:4.12'
+    compile 'de.hhu.stups:virtual-kata-lib:1.0.1'
 }

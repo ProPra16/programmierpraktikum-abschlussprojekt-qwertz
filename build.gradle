@@ -1,6 +1,9 @@
 apply plugin: 'java'
+apply plugin: 'application'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
+
+mainClassName = 'attd.main.Main'
 
 repositories {
     mavenCentral()

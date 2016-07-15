@@ -14,7 +14,7 @@
 					focusTraversable="true" orientation="VERTICAL">
 					<items>
 						<CustomListView fx:id="CatalogListView"
-							stylesheets="@../../resources/ListView.css" />
+							stylesheets="/ListView.css" />
 						<BorderPane>
 							<center>
 								<TextArea fx:id="DescriptionArea" wrapText="true" />

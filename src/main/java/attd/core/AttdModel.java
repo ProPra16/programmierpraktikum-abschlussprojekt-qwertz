@@ -102,7 +102,7 @@ public class AttdModel {
 			currentVersion.getCodes().getClassCode().setCode(codeProperty.get());
 			break;
 		}
-		if (alert && showAlert(new Alert(AlertType.CONFIRMATION, "Möchten Sie die Änderungen am Code speichern?", ButtonType.OK))) {
+		if (alert && showAlert(new Alert(AlertType.CONFIRMATION, "MÃ¶chten Sie die Ã„nderungen am Code speichern?", ButtonType.OK))) {
 			catalogRepository.save();
 		}
 
@@ -221,12 +221,12 @@ public class AttdModel {
 	
 	private boolean checkTest(String code, String test, int numberOfFailingTests){
 
-		CompilerResult cr = compiler.getCompilerResult(test);  //prüft ob  der test überhaupt kompiliert
+		CompilerResult cr = compiler.getCompilerResult(test);  //prï¿½ft ob  der test ï¿½berhaupt kompiliert
 		System.out.println(cr.hasCompileErrors());
 		if(!cr.hasCompileErrors()){
 			
 			CustomTestResult ctr = compiler.getTestResult(code, test);
-			if(ctr.compiled() && ctr.getNumberOfFailedTests() == numberOfFailingTests){//prüft ob ein test fehlschlägt
+			if(ctr.compiled() && ctr.getNumberOfFailedTests() == numberOfFailingTests){//prï¿½ft ob ein test fehlschlï¿½gt
 				return true;
 			}else{
 				setTestFailures(ctr.getTestFailures());
@@ -234,7 +234,6 @@ public class AttdModel {
 			
 			
 		}else{
-			
 		}
 
 		return false;
@@ -263,12 +262,12 @@ public class AttdModel {
 
 	public void init(Version version, Exercise exercise) {
 		if (oldVersion != null
-				&& showAlert(new Alert(AlertType.WARNING, "Möchten Sie die Änderungen an der Aufgabe speichern?", ButtonType.YES, ButtonType.NO))) {
+				&& showAlert(new Alert(AlertType.WARNING, "MÃ¶chten Sie die Ã„nderungen an der Aufgabe speichern?", ButtonType.YES, ButtonType.NO))) {
 			catalogRepository.save();
 		} else {
 			currentVersion = oldVersion;
 		}
-		if (showAlert(new Alert(AlertType.CONFIRMATION, "Möchten Sie die Aufgabe starten?", ButtonType.YES, ButtonType.NO))) {
+		if (showAlert(new Alert(AlertType.CONFIRMATION, "MÃ¶chten Sie die Aufgabe starten?", ButtonType.YES, ButtonType.NO))) {
 
 			stopTimeline();
 			this.oldVersion = version;
@@ -340,7 +339,7 @@ public class AttdModel {
 		stage.setTitle("Workspace Launcher");
 		stage.setResizable(false);
 		ViewTuple<WorkspaceController, WorkspaceModel> workspaceTuple = fxmlLoader.load(WorkspaceController.class, WorkspaceModel.class,
-				"WorkspaceView.fxml");
+				"/WorkspaceView.fxml");
 		stage.setScene(new Scene(workspaceTuple.getParent()));
 		stage.showAndWait();
 	}

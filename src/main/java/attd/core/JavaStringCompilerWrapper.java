@@ -47,7 +47,10 @@ public class JavaStringCompilerWrapper {
 					    compiler.compileAndRunTests();
 					    errors.addAll(compiler.getCompilerResult().getCompilerErrorsForCompilationUnit(d));
 					    compiler.getCompilerResult().getCompilerErrorsForCompilationUnit(d).stream().filter(predicate()).forEach(k -> filtered.add(k));
+
+
 					    if(test.contains("@Test") && test.contains("assert") && filtered.size()==0){
+
 					        return new CompilerResult() {
 					            @Override
 					            public boolean hasCompileErrors() {
@@ -56,15 +59,32 @@ public class JavaStringCompilerWrapper {
 
 					            @Override
 					            public Duration getCompileDuration() {
-					                return null;
+					                return compiler.getCompilerResult().getCompileDuration();
 					            }
 
 					            @Override
 					            public Collection<CompileError> getCompilerErrorsForCompilationUnit(CompilationUnit cu) {
-					                return null;
+					                return compiler.getCompilerResult().getCompilerErrorsForCompilationUnit(d);
 					            }
 					        };
-					    }
+					    }else{
+							return new CompilerResult() {
+								@Override
+								public boolean hasCompileErrors() {
+									return true;
+								}
+
+								@Override
+								public Duration getCompileDuration() {
+									return compiler.getCompilerResult().getCompileDuration();
+								}
+
+								@Override
+								public Collection<CompileError> getCompilerErrorsForCompilationUnit(CompilationUnit cu) {
+									return filtered;
+								}
+							};
+						}
 
 					}
 
@@ -85,7 +105,7 @@ public class JavaStringCompilerWrapper {
 					@Override
 					public String getMessage() {
 						// TODO Auto-generated method stub
-						return "";
+						return "Der Klassenname wurde nicht gefunden";
 					}
 					
 					@Override

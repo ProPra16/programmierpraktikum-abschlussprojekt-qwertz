@@ -1,156 +1,141 @@
 package attd.core;
 
-import vk.core.api.*;
-
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
+import vk.core.api.CompilationUnit;
+import vk.core.api.CompileError;
+import vk.core.api.CompilerFactory;
+import vk.core.api.CompilerResult;
+import vk.core.api.JavaStringCompiler;
+
 public class JavaStringCompilerWrapper {
 
-	private List<CompileError> getClassExeptions(String code) {
-		List<CompileError> errors = new ArrayList<>();
-		CompileError checkfirst = nullExeption(code);
-		if (checkfirst != null) {
-			errors.add(checkfirst);
-		} else {
 
-			CompilationUnit c = new CompilationUnit(classNameParser(code), code, false);
-			JavaStringCompiler javaStringCompiler = CompilerFactory.getCompiler(c);
-			javaStringCompiler.compileAndRunTests();
+    public CustomTestResult getTestResult(String code, String test) {
+        CompilationUnit c = new CompilationUnit(classNameParser(code), code, false);
+        CompilationUnit d = new CompilationUnit(classNameParser(test), test, true);
 
-			errors.addAll(javaStringCompiler.getCompilerResult().getCompilerErrorsForCompilationUnit(c));
-		}
-		return errors;
-	}
+        JavaStringCompiler compiler = CompilerFactory.getCompiler(c, d);
 
-	public List<CompileError> getTestExceptions(String test) {
+        try{
 
-		List<CompileError> errors = getClassExeptions(test);
+            compiler.compileAndRunTests();
 
-		if (test != null && !test.contains("@Test")) {
-			errors.add(new CompileError() {
-				@Override
-				public long getLineNumber() {
-					return 0;
-				}
+            if (!compiler.getCompilerResult().hasCompileErrors()) {
+                return new CustomTestResult(true, compiler.getTestResult());
+            }
+        }catch (Exception e){
+            
+        }
+        return new CustomTestResult(false,null);
+    }
 
-				@Override
-				public long getColumnNumber() {
-					return 0;
-				}
 
-				@Override
-				public String getMessage() {
-					return "Die Klasse enthaelt keine Tests";
-				}
+    public CompilerResult getCompilerResult(String test){
+        CompilationUnit d = new CompilationUnit(classNameParser(test), test, true);
 
-				@Override
-				public String getCodeLineContainingTheError() {
-					return "";
-				}
-			});
-		}
+        JavaStringCompiler compiler = CompilerFactory.getCompiler(d);
+        List<CompileError> errors = new ArrayList<>();
+        List<CompileError> filtered = new ArrayList<>();
 
-		return errors;
+                	
+					if (classNameParser(test)!=null) {
+					    compiler.compileAndRunTests();
+					    errors.addAll(compiler.getCompilerResult().getCompilerErrorsForCompilationUnit(d));
+					    compiler.getCompilerResult().getCompilerErrorsForCompilationUnit(d).stream().filter(predicate()).forEach(k -> filtered.add(k));
+					    if(test.contains("@Test") && test.contains("assert") && filtered.size()==0){
+					        return new CompilerResult() {
+					            @Override
+					            public boolean hasCompileErrors() {
+					                return false;
+					            }
 
-	}
+					            @Override
+					            public Duration getCompileDuration() {
+					                return null;
+					            }
 
-	private CompileError nullExeption(String code) {
-		if (code == null || code.replace(" ", "").equals("")) {
-			return (new CompileError() {
-				@Override
-				public long getLineNumber() {
-					return 0;
-				}
+					            @Override
+					            public Collection<CompileError> getCompilerErrorsForCompilationUnit(CompilationUnit cu) {
+					                return null;
+					            }
+					        };
+					    }
 
-				@Override
-				public long getColumnNumber() {
-					return 0;
-				}
+					}
 
-				@Override
-				public String getMessage() {
-					return "Die Klasse enthaelt keinen kompilierbaren Code";
-				}
-
-				@Override
-				public String getCodeLineContainingTheError() {
-					return "0";
-				}
-			});
-
-		}
-		return null;
-	}
-
-	private boolean classCompilable(String code) {
-		List<CompileError> errors = getClassExeptions(code);
-		if (errors.size() == 0) {
-			return true;
-		}
-		return false;
-	}
-
-	public boolean testCompilable(String test) {
-		List<CompileError> errors1 = getTestExceptions(test);
-		List<CompileError> errors2 = getClassExeptions(test);
-
-		if (errors1.size() == errors2.size() && errors2.stream().filter(filter()).count() == errors1.size()) {
-			return true;
-		}
-
-		return false;
-	}
-
-	private Predicate<CompileError> filter() {
-		return new Predicate<CompileError>() {
+        return new CompilerResult() {
+			
 			@Override
-			public boolean test(CompileError compileError) {
-				String e = compileError.getMessage();
-				return e.contains("cannot find symbol") && (e.contains("class") || e.contains("variable") || e.contains("method"));
+			public boolean hasCompileErrors() {
+				// TODO Auto-generated method stub
+				return true;
+			}
+		
+			
+			@Override
+			public Collection<CompileError> getCompilerErrorsForCompilationUnit(CompilationUnit cu) {
+				List<CompileError>tCompileErrors  = new ArrayList<>();
+				tCompileErrors.add(new CompileError() {
+					
+					@Override
+					public String getMessage() {
+						// TODO Auto-generated method stub
+						return "";
+					}
+					
+					@Override
+					public long getLineNumber() {
+						// TODO Auto-generated method stub
+						return 0;
+					}
+					
+					@Override
+					public long getColumnNumber() {
+						// TODO Auto-generated method stub
+						return 0;
+					}
+					
+					@Override
+					public String getCodeLineContainingTheError() {
+						// TODO Auto-generated method stub
+						return "";
+					}
+				});
+				return tCompileErrors;
+			}
+			
+			@Override
+			public Duration getCompileDuration() {
+				// TODO Auto-generated method stub
+				return Duration.ZERO;
 			}
 		};
-	}
+    }
 
-	public boolean passTests(String code, String test) {
 
-		if (classCompilable(code) && testCompilable(test)) {
-			CompilationUnit a = new CompilationUnit(classNameParser(code), code, false);
-			CompilationUnit b = new CompilationUnit(classNameParser(test), test, true);
-			JavaStringCompiler javaStringCompiler = CompilerFactory.getCompiler(a, b);
-			javaStringCompiler.compileAndRunTests();
+    private Predicate<? super CompileError> predicate() {
+        return new Predicate<CompileError>() {
+            @Override
+            public boolean test(CompileError compileError) {
+                String e = compileError.getMessage();
+                return !(e.contains("cannot find symbol") && (e.contains("class") || e.contains("variable") || e.contains("method")));
+            }
+        };
+    }
 
-			if (javaStringCompiler.getCompilerResult().hasCompileErrors()) {
-				return false;
-			}
+    private String classNameParser(String code) {
 
-			return true;
-		}
-		return false;
-	}
+        try {
 
-	public List<CompileError> getTestFailures(String code, String test) {
-		List<CompileError> errors = new ArrayList<>();
+            return code.subSequence(code.indexOf("class") + 6, code.indexOf("{")).toString().replace(" ", "");
+        } catch (StringIndexOutOfBoundsException e) {
 
-		CompilationUnit a = new CompilationUnit(classNameParser(code), code, false);
-		CompilationUnit b = new CompilationUnit(classNameParser(test), test, true);
-		JavaStringCompiler javaStringCompiler = CompilerFactory.getCompiler(a, b);
-		javaStringCompiler.compileAndRunTests();
-		errors.addAll(javaStringCompiler.getCompilerResult().getCompilerErrorsForCompilationUnit(a));
-		errors.addAll(javaStringCompiler.getCompilerResult().getCompilerErrorsForCompilationUnit(b));
-
-		return errors;
-	}
-
-	private String classNameParser(String code) {
-
-		try {
-
-			return code.subSequence(code.indexOf("class") + 6, code.indexOf("{")).toString().replace(" ", "");
-		} catch (StringIndexOutOfBoundsException e) {
-
-			return "";
-		}
-	}
+            return null;
+        }
+    }
 }

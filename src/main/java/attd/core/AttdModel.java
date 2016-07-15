@@ -15,9 +15,15 @@ import javafx.stage.Stage;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextInputDialog;
 import javafx.util.Duration;
+import javafx.util.converter.ShortStringConverter;
 import vk.core.api.CompileError;
+import vk.core.api.CompilerResult;
+import vk.core.api.TestFailure;
+
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import attd.mvc.FxmlLoader;
@@ -36,7 +42,7 @@ public class AttdModel {
 	private StringProperty codeProperty = new SimpleStringProperty();
 	private CatalogRepository catalogRepository = new CatalogRepository();
 	private JavaStringCompilerWrapper compiler = new JavaStringCompilerWrapper();
-	private ListProperty<CompileError> errorProperty = new SimpleListProperty<>();
+	private ListProperty<TestFailure> errorProperty = new SimpleListProperty<>();
 
 	public boolean exerciseLoaded() {
 		return currentVersion != null;
@@ -61,7 +67,7 @@ public class AttdModel {
 		return stateProperty;
 	}
 
-	public ListProperty<CompileError> ErrorProperty() {
+	public ListProperty<TestFailure> ErrorProperty() {
 		return errorProperty;
 	}
 
@@ -85,7 +91,6 @@ public class AttdModel {
 
 	private void holdCode(State state, boolean alert) {
 
-		
 		switch (state) {
 		case writeFailingTest:
 			currentVersion.getCodes().getTestCode().setCode(codeProperty.get());
@@ -121,53 +126,65 @@ public class AttdModel {
 
 		if (currentVersion != null) {
 			errorProperty.set(null);
+			String code = currentVersion.getCodes().getClassCode().getCode();
 			String inc = codeProperty.get();
 			String test = currentVersion.getCodes().getTestCode().getCode();
+			
 			try {
 				switch (state) {
 				case writeFailingTest:
-					if (compiler.testCompilable(inc)) { // prüft ob der test
-														// kompiliert und es
-														// einen fehlschlagenden
-														// test gibt
+					
+					if (checkTest(code, inc,1)) { // prüft
+																						// ob
+																						// der
+																						// test
+						// kompiliert und es
+						// einen fehlschlagenden
+						// test gibt
 
 						stopTimeline();
-						holdCode(state,true);
+						holdCode(state, true);
 						changeState(State.makeTheTestPass);
 
 					} else {
-						setErrors(compiler.getTestExceptions(inc));
+						// setErrors(compiler.getTestExceptions(inc));
 					}
 
 					break;
 				case makeTheTestPass:
-
-					if (compiler.passTests(inc, test)) { // prüft ob der Code
-															// die Tests besteht
-															// && der code
-															// kompiliert
+					
+					if (checkTest(inc, test, 0)) { // prüft
+																						// ob
+																						// der
+																						// Code
+						// die Tests besteht
+						// && der code
+						// kompiliert
 						stopTimeline();
-						holdCode(state,true);
+						holdCode(state, true);
 						changeState(State.refactor);
 
 					} else {
-						setErrors(compiler.getTestFailures(inc, test));
+						// setErrors(compiler.getTestFailures(inc, test));
 					}
 					break;
 				case refactor:
-					if (compiler.passTests(inc, test)) { // prüft ob refract
-															// kompiliert &&
-															// tests besteht
-						holdCode(state,true);
-						if (exercise.getConfigurations().AcceptanceTestEnabled()
-								&& compiler.passTests(inc, currentVersion.getCodes().getAcceptanceCode().getCode())) {// prüft
-																														// ob
-																														// acceptancetestenabled
-																														// &&
-																														// code
-																														// besteht
-																														// acceptancetests
-
+					
+					if (checkTest(inc, test, 0)) { // prüft
+																						// ob
+																						// refract
+						// kompiliert &&
+						// tests besteht
+						
+						holdCode(state, true);
+						if (checkTest(inc, currentVersion.getCodes().getAcceptanceCode().getCode(), 0)) {// prüft
+																						// ob
+																						// acceptancetestenabled
+																						// &&
+																						// code
+																						// besteht
+																						// acceptancetests
+							holdCode(state, true);
 							currentVersion.getCodes().getAcceptanceCode().implementedProperty().set(true);
 							changeState(State.acceptanceTest);
 						} else {
@@ -175,19 +192,22 @@ public class AttdModel {
 							changeState(State.writeFailingTest);
 						}
 					} else {
-						setErrors(compiler.getTestFailures(inc, test));
+						// setErrors(compiler.getTestFailures(inc, test));
 					}
 					break;
 				case acceptanceTest:
-					if (compiler.testCompilable(inc)) { // prüft ob der
-														// akzeptanztest
-														// kompiliert && es
-														// einen fehlschlangeden
-														// Akzeptanztest gibt
-						holdCode(state,true);
+					
+					if (checkTest(code,inc, 1)) { // prüft
+																						// ob
+																						// der
+						// akzeptanztest
+						// kompiliert && es
+						// einen fehlschlangeden
+						// Akzeptanztest gibt
+						holdCode(state, true);
 						changeState(State.writeFailingTest);
 					} else {
-						setErrors(compiler.getTestExceptions(inc));
+						// setErrors(compiler.getTestExceptions(inc));
 					}
 
 					break;
@@ -198,9 +218,33 @@ public class AttdModel {
 			}
 		}
 	}
+	
+	private boolean checkTest(String code, String test, int numberOfFailingTests){
 
-	private void setErrors(List<CompileError> errors) {
-		errorProperty.set(FXCollections.observableList(errors));
+		CompilerResult cr = compiler.getCompilerResult(test);  //pr�ft ob  der test �berhaupt kompiliert
+		System.out.println(cr.hasCompileErrors());
+		if(!cr.hasCompileErrors()){
+			
+			CustomTestResult ctr = compiler.getTestResult(code, test);
+			if(ctr.compiled() && ctr.getNumberOfFailedTests() == numberOfFailingTests){//pr�ft ob ein test fehlschl�gt
+				return true;
+			}else{
+				setTestFailures(ctr.getTestFailures());
+			}
+			
+			
+		}else{
+			
+		}
+
+		return false;
+	}
+
+	private void setErrors(Collection<TestFailure> errors) {
+		
+	}
+	private void setTestFailures(Collection<TestFailure> testFailures){
+		errorProperty.set(FXCollections.observableList(new ArrayList<>(testFailures)));
 	}
 
 	private void timeExpired() {
@@ -258,7 +302,7 @@ public class AttdModel {
 	}
 
 	public void save() {
-		holdCode(state,false);
+		holdCode(state, false);
 		catalogRepository.save();
 	}
 
@@ -280,16 +324,17 @@ public class AttdModel {
 
 	}
 
-	public void test(){
+	public void test() {
 		System.out.println("huhu");
 	}
 
 	public void load() {
-		if(!catalogRepository.load()){
+		if (!catalogRepository.load()) {
 			changeWorkspace();
 		}
 	}
-	public void changeWorkspace(){
+
+	public void changeWorkspace() {
 		FxmlLoader fxmlLoader = new FxmlLoader();
 		Stage stage = new Stage();
 		stage.setTitle("Workspace Launcher");

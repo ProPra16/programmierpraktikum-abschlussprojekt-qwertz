@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+    <exercises>
+        <exercise>
+            <name>Römische Zahlen</name>
+            <description>Konvertiert arabische in römische Zahlen.</description>
+            <configuration>
+                <babysteps>0</babysteps>
+                <acceptancetests>false</acceptancetests>
+            </configuration>
+            <codes>
+                <testcode>import static org.junit.Assert.*;
+import org.junit.Test;
+
+public class RomanNumbersTest {
+	@Test
+	public void testSomething() {
+		
+	}
+}</testcode>
+                <classcode>public class RomanNumberConverter {
+	
+}</classcode>
+            </codes>
+        </exercise>
+        <exercise>
+            <name>Römische Zahlen auf Zeit</name>
+            <description>Konvertiert arabische in römische Zahlen.</description>
+            <configuration>
+                <babysteps>120</babysteps>
+                <acceptancetests>false</acceptancetests>
+            </configuration>
+            <codes>
+                <testcode>import static org.junit.Assert.*;
+import org.junit.Test;
+
+public class RomanNumbersTest {
+	@Test
+	public void testSomething() {
+		
+	}
+}</testcode>
+                <classcode>public class RomanNumberConverter {
+	
+}</classcode>
+            </codes>
+        </exercise>
+        <exercise>
+            <name>Römische Zahlen auf Zeit mit Akzeptanz</name>
+            <description>Konvertiert arabische in römische Zahlen.</description>
+            <configuration>
+                <babysteps>240</babysteps>
+                <acceptancetests>true</acceptancetests>
+            </configuration>
+            <codes>
+                <testcode>import static org.junit.Assert.*;
+import org.junit.Test;
+
+public class RomanNumbersTest {
+	@Test
+	public void testSomething() {
+		
+	}
+}</testcode>
+                <classcode>public class RomanNumberConverter {
+	
+}</classcode>
+            </codes>
+        </exercise>
+    </exercises>
+</catalog>

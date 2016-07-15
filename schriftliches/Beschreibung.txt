@@ -1,0 +1,167 @@
+﻿Klassen
+
+
+
+
+Main
+	ListView
+	css
+	
+
+	Main
+	java
+	
+
+	TableRow
+	css
+	             
+core                
+	AcceptanceCode
+	java
+	Erweitert die Klasse "Code" und speichert den Akzeptanzcode in einem String.
+Speichert außerdem, ob der Akzeptanzcode bestanden wurde (wird für die graphische Oberfläche benutzt).
+	AttdController
+	java
+	
+	AttdModel
+	java
+	
+	AttdView
+	fxml
+	
+	Catalog
+	java
+	Repräsentiert einen Katalog von Aufgaben, der einen Namen besitzt und eine Liste von Aufgaben
+(in einer Liste von Instanzen der Klasse "Exercise") speichert.
+	
+	CatalogRepository
+	java
+	Lädt und speichert den aktuell ausgewählten Katalog mit Hilfe von den Klassen "CatalogLoader" und "ConfigLoader".
+Beim Laden wird dem Benutzer ein Fenster zum Auswählen der Datei angezeigt.
+	
+	Code
+	java
+	Speichert den Code in einem String. Verwendet für Testcode und Klassencode.
+	
+	Codes
+	java
+	Wird von den Klassen "Exercise" und "Version" verwendet, um die Codes einer Aufgabe zu speichern:
+den Testcode, den Klassencode (beides mit der Klasse "Code") und, wenn nötig, den Akzeptanzcode (mit der Klasse "AcceptanceCode")
+	
+	Configurations
+	java
+	Wird von der Klasse "Exercise" verwendet und speichert die Konfiguration einer Aufgabe,
+d.h. ob Akzeptanz-Tests und Baby-Steps aktiviert sind und ggf. wie viel Zeit der Benutzer
+zur Bearbeitung mit Baby-Steps hat.
+	
+	CustomCallback
+	java
+	
+	CustomListView
+	java
+	
+	ErrorControl
+	java
+	
+	Exercise
+	java
+	Repräsentiert eine Aufgabe, die einen Namen und eine Beschreibung,
+die Konfiguration einer Aufgabe (mit der Klasse "Configurations"),
+die vordefinierten Codes einer Aufgabe (mit der Klasse "Codes"),
+sowie die Versionen (in einer Liste von Instanzen der Klasse "Version"),
+die der Benutzer angelegt hat, speichert.
+	
+	JavaStringCompilerWrapper
+	java
+	
+	State
+	java
+
+	Version
+	java
+	Repräsentiert eine Version einer Aufgabe des Benutzers. Eine Version
+besitzt einen Titel und die Codes die der Benutzer eingegeben hat (gespeichert mit der Klasse "Codes").
+	
+loader
+	CatalogLoader
+	java
+	Erweitert die Klasse "XmlLoader" und liest und speichert eine Instanz der Klasse "Catalog" in einer angegebenen
+XML-Datei.
+
+	Config
+	java
+	Speichert den Pfad zum "Workspace-Ordner". Sobald der Benutzer zum ersten Mal eine Datei lädt oder speichert,
+wird dieser Pfad abgefragt. In diesem Ordner werden die Dateien und der Code des Benutzers gespeichert.
+	
+	ConfigLoader
+	java
+	Erweitert die Klasse "XmlLoader" und liest und speichert die "config.xml"-Datei, in der die Informationen
+einer Instanz der Klasse "Config" gespeichert werden. Sie liegt immer im Arbeitsverzeichnis des Programms,
+wenn sie nicht vorhanden ist, wird sie beim Speichern erstellt.
+	
+	XmlLoader
+	java
+	Oberklasse von den Klassen "ConfigLoader" und "CatalogLoader", die Methoden zum Lesen und Schreiben
+von XML-Dateien zur Verfügung stellt.
+	
+
+mvc
+	FxmlLoader
+	java
+	
+	InjectModel
+	java
+	
+	ViewTuple
+	java
+	
+workspace
+	WorkspaceController
+	java
+	
+	WorkspaceModel
+	java
+	
+	WorkspaceView
+	fxml
+	
+api
+	CompilationUnit
+	java
+	
+	ComplieError
+	java
+
+	CompilerFactory
+	java
+
+	CompilerResult
+	java
+
+	JavaStringCompiler
+	java
+	
+	TestFailure
+	java
+	
+	TestResult
+	java
+	
+internal
+	InternalComplieProblem
+	java
+	
+	InternalCompiler
+	java
+
+	InternalCompilerException
+	java
+
+	InternalFailure
+	java
+
+	InternalResult
+	java
+	
+	InternalStatistics
+	java

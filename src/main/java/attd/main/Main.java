@@ -27,7 +27,7 @@ public class Main extends Application {
 		stage.setTitle("ATTD");
 		ViewTuple<AttdController, AttdModel> attdTuple = fxmlLoader.load(AttdController.class, AttdModel.class, "/AttdView.fxml");
 		stage.setOnCloseRequest(e -> {
-			Alert alert = new Alert(AlertType.WARNING, "Möchten Sie die Anderungen an der Aufgabe speichern?", ButtonType.YES, ButtonType.NO);
+			Alert alert = new Alert(AlertType.WARNING, "Möchten Sie die Änderungen an der Aufgabe speichern?", ButtonType.YES, ButtonType.NO);
 			if (attdTuple.getModel().exerciseLoaded() && alert.showAndWait().get() == ButtonType.YES) {
 				attdTuple.getModel().save();
 			}

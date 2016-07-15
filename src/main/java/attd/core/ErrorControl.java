@@ -1,33 +1,44 @@
 package attd.core;
 
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.scene.control.Label;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import vk.core.api.CompilationUnit;
-import vk.core.api.TestFailure;
-import vk.core.api.CompilerResult;
-import vk.core.api.TestFailure;
+import javafx.util.Callback;
+import vk.core.api.CompileError;
 
-public class ErrorControl extends TableView<TestFailure> {
-
+public class ErrorControl extends TableView<CompileError> {
     public ErrorControl() {
-       TableColumn<TestFailure, String> errorColumn = new TableColumn<>("StackTrace");
-        errorColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getExceptionStackTrace()));
-
-        TableColumn<TestFailure, String> codeLineColumn = new TableColumn<>("Message");
-        codeLineColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getMessage()));
-
-        TableColumn<TestFailure, String> errorColumnColumn = new TableColumn<>("MethodName");
-        errorColumnColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getMethodName()));
-
-        TableColumn<TestFailure, String> errorLineColumn = new TableColumn<>("TestClassName");
-        errorLineColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getTestClassName()));
-
-        setPlaceholder(new Label("Keine Fehler"));
+        TableColumn<CompileError, String> tc1 = new TableColumn<>("Error");
+        tc1.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<CompileError, String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<CompileError, String> param) {
+                return new SimpleStringProperty(param.getValue().getMessage());
+            }
+        });
+        TableColumn<CompileError, String> tc2 = new TableColumn<>("Code Line");
+        tc2.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<CompileError, String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<CompileError, String> param) {
+                return new SimpleStringProperty(param.getValue().getCodeLineContainingTheError());
+            }
+        });
+        TableColumn<CompileError, String> tc3 = new TableColumn<>("Column Number");
+        tc3.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<CompileError, String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<CompileError, String> param) {
+                return new SimpleStringProperty(Long.toString(param.getValue().getColumnNumber()));
+            }
+        });
+        TableColumn<CompileError, String> tc4 = new TableColumn<>("Line Number");
+        tc4.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<CompileError, String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<CompileError, String> param) {
+                return new SimpleStringProperty(Long.toString(param.getValue().getLineNumber()));
+            }
+        });
         setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        getColumns().addAll(errorColumn, codeLineColumn, errorColumnColumn, errorLineColumn);
+        getColumns().addAll(tc1, tc2, tc3, tc4);
     }
-    
+
 }

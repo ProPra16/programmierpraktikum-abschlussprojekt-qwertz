@@ -5,6 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import attd.core.CustomListView?>
 <?import attd.core.ErrorControl?>
+<?import attd.core.TestResultControl?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2">
 	<center>
 		<SplitPane dividerPositions="0.29914529914529914"
@@ -49,6 +50,9 @@
 													</center>
 												</BorderPane>
 												<BorderPane prefHeight="-1.0" prefWidth="-1.0">
+													<top>
+														<TestResultControl fx:id="TestResultView"/>
+													</top>
 													<center>
 														<ErrorControl fx:id="ErrorView" prefHeight="-1.0"
 															prefWidth="-1.0" />

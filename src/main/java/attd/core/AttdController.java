@@ -27,6 +27,9 @@ public class AttdController {
 	@FXML
 	private ErrorControl ErrorView;
 
+	@FXML
+	private TestResultControl TestResultView;
+
 	@InjectModel
 	private AttdModel attdModel;
 
@@ -56,8 +59,9 @@ public class AttdController {
 	}
 
 	public void initialize() {
+		TestResultView.ItemProperty().bind(attdModel.TestResultProperty());
 		CatalogListView.itemsProperty().bind(attdModel.getCatalogRepository().catalogProperty());
-		
+		TestResultView.visibleProperty().bind(Bindings.equal(State.makeTheTestPass.toString(),attdModel.StateProperty()).or(Bindings.equal(State.refactor.toString(),attdModel.StateProperty())));
 		ErrorView.itemsProperty().bind(attdModel.ErrorProperty());
 
 		StateLabel.textProperty().bind(attdModel.StateProperty());

@@ -3,11 +3,9 @@ package attd.core;
 import javafx.animation.Animation.Status;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -30,19 +28,23 @@ import attd.mvc.FxmlLoader;
 import attd.mvc.ViewTuple;
 import attd.workspace.WorkspaceController;
 import attd.workspace.WorkspaceModel;
+import vk.core.api.TestResult;
 
 public class AttdModel {
 	private Version currentVersion;
 	private Version oldVersion;
 	private Exercise exercise;
 
-	private State state;
+
 	private StringProperty stateProperty = new SimpleStringProperty();
 	private StringProperty timeProperty = new SimpleStringProperty();
 	private StringProperty codeProperty = new SimpleStringProperty();
 	private CatalogRepository catalogRepository = new CatalogRepository();
 	private JavaStringCompilerWrapper compiler = new JavaStringCompilerWrapper();
 	private ListProperty<CompileError> errorProperty = new SimpleListProperty<>();
+	public ObjectProperty<TestResult> testResultProperty = new SimpleObjectProperty<>();
+	public ObjectProperty<TestResult> TestResultProperty() {return testResultProperty;}
+
 
 	public boolean exerciseLoaded() {
 		return currentVersion != null;
@@ -89,9 +91,9 @@ public class AttdModel {
 		}
 	}
 
-	private void holdCode(State state, boolean alert) {
-
-		switch (state) {
+	public void save() {
+		if(currentVersion==null){return;}
+		switch (currentVersion.getState()) {
 		case writeFailingTest:
 			currentVersion.getCodes().getTestCode().setCode(codeProperty.get());
 			break;
@@ -102,7 +104,8 @@ public class AttdModel {
 			currentVersion.getCodes().getClassCode().setCode(codeProperty.get());
 			break;
 		}
-		if (alert && showAlert(new Alert(AlertType.CONFIRMATION, "Möchten Sie die Änderungen am Code speichern?", ButtonType.OK))) {
+		if (showAlert(new Alert(AlertType.CONFIRMATION, "Möchten Sie die Änderungen am Code speichern?", ButtonType.YES, ButtonType.NO))) {
+			System.out.print("ok");
 			catalogRepository.save();
 		}
 
@@ -131,7 +134,7 @@ public class AttdModel {
 			String test = currentVersion.getCodes().getTestCode().getCode();
 			
 			try {
-				switch (state) {
+				switch (currentVersion.getState()) {
 				case writeFailingTest:
 					
 					if (check(code, inc, 1)) { // prüft
@@ -143,12 +146,12 @@ public class AttdModel {
 						// test gibt
 
 						stopTimeline();
-						holdCode(state, true);
+						save();
 						changeState(State.makeTheTestPass);
 
-					} else {
-						// setErrors(compiler.getTestExceptions(inc));
 					}
+
+
 
 					break;
 				case makeTheTestPass:
@@ -161,7 +164,7 @@ public class AttdModel {
 						// && der code
 						// kompiliert
 						stopTimeline();
-						holdCode(state, true);
+						save();
 						changeState(State.refactor);
 
 					}
@@ -174,26 +177,24 @@ public class AttdModel {
 						// kompiliert &&
 						// tests besteht
 						
-						holdCode(state, true);
-						if (check(inc, currentVersion.getCodes().getAcceptanceCode().getCode(), 0)) {// prüft
+						save();
+						if (exercise.getConfigurations().AcceptanceTestEnabled()&& check(inc, currentVersion.getCodes().getAcceptanceCode().getCode(), 0)) {// prüft
 																						// ob
 																						// acceptancetestenabled
 																						// &&
 																						// code
 																						// besteht
 																						// acceptancetests
-							holdCode(state, true);
+							save();
 							currentVersion.getCodes().getAcceptanceCode().implementedProperty().set(true);
 							changeState(State.acceptanceTest);
 						} else {
 
 							changeState(State.writeFailingTest);
 						}
-					} else {
-						// setErrors(compiler.getTestFailures(inc, test));
 					}
 					break;
-				case acceptanceTest:
+					case acceptanceTest:
 					
 					if (check(code, inc, 1)) { // prüft
 																						// ob
@@ -202,10 +203,8 @@ public class AttdModel {
 						// kompiliert && es
 						// einen fehlschlangeden
 						// Akzeptanztest gibt
-						holdCode(state, true);
+						save();
 						changeState(State.writeFailingTest);
-					} else {
-						// setErrors(compiler.getTestExceptions(inc));
 					}
 
 					break;
@@ -218,16 +217,15 @@ public class AttdModel {
 	}
 	private boolean check(String code,String test, int failures){
 		CustomCompilerResult ccr= compiler.getCustomCompilerResult(code, test);
+
 		if(ccr.hasCompileErrors()){
-
-				setErrors(ccr.getCustomErrorResult().getCompilerErrors());
-				return false;
-
+			setErrors(ccr.getCompileErrors());
+			return false;
 		}
-
 		if(ccr.getTestResult().getNumberOfFailedTests() == failures){
 			return true;
 		}
+		testResultProperty.setValue(ccr.getTestResult());
 		return false;
 	}
 
@@ -236,10 +234,10 @@ public class AttdModel {
 	}
 
 	private void timeExpired() {
-		if (state == State.writeFailingTest) {
+		if (currentVersion.getState() == State.writeFailingTest) {
 			changeState(State.refactor);
 		}
-		if (state == State.makeTheTestPass) {
+		if (currentVersion.getState() == State.makeTheTestPass) {
 			changeState(State.writeFailingTest);
 		}
 	}
@@ -250,9 +248,10 @@ public class AttdModel {
 	}
 
 	public void init(Version version, Exercise exercise) {
+
 		if (oldVersion != null
 				&& showAlert(new Alert(AlertType.WARNING, "Möchten Sie die Änderungen an der Aufgabe speichern?", ButtonType.YES, ButtonType.NO))) {
-			catalogRepository.save();
+			save();
 		} else {
 			currentVersion = oldVersion;
 		}
@@ -285,14 +284,11 @@ public class AttdModel {
 		if (state == State.writeFailingTest || state == State.makeTheTestPass) {
 			initTimer();
 		}
-		this.state = state;
+		////////////////////////this.state = state;
+		currentVersion.setState(state);
 		stateProperty.set(state.toString());
 	}
-
-	public void save() {
-		holdCode(state, false);
-		catalogRepository.save();
-	}
+	
 
 	public void addCatalogItem(Exercise param) {
 		TextInputDialog textInputDialog = new TextInputDialog();
@@ -329,4 +325,6 @@ public class AttdModel {
 		stage.setScene(new Scene(workspaceTuple.getParent()));
 		stage.showAndWait();
 	}
+
+
 }

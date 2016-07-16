@@ -1,29 +1,35 @@
 package attd.core;
 
+import vk.core.api.CompileError;
+import vk.core.api.TestFailure;
 import vk.core.api.TestResult;
+
+import java.time.Duration;
+import java.util.Collection;
 
 /**
  * Created by student on 15/07/16.
  */
 public class CustomCompilerResult {
 
-    private CustomErrorResult customErrorResult;
+    private Collection<CompileError> compileErrors;
     private TestResult testresult;
-    private boolean compileErrors=true;
+    private boolean hascompileerrors;
 
-    public CustomCompilerResult(CustomErrorResult customErrorResult) {
-        this.customErrorResult = customErrorResult;
-
+    public CustomCompilerResult(Collection<CompileError> compileErrors) {
+        this.compileErrors = compileErrors;
+        hascompileerrors=compileErrors.size()>0;
     }
-
-    public CustomCompilerResult(TestResult tests){
-        testresult = tests;
-        compileErrors = false;
+    public CustomCompilerResult(TestResult testResult){
+        this.testresult=testResult;
+        hascompileerrors=false;
     }
-
-    public CustomErrorResult getCustomErrorResult(){return customErrorResult;}
 
     public TestResult getTestResult(){return testresult;}
 
-    public boolean hasCompileErrors(){return compileErrors;}
+    public Collection<CompileError> getCompileErrors(){return compileErrors;}
+
+    public boolean hasCompileErrors(){return hascompileerrors;}
+
+
 }
